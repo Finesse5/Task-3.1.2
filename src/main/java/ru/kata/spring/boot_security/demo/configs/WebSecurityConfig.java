@@ -38,12 +38,14 @@ public class WebSecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .successHandler(successUserHandler)
+                        .failureUrl("/login?error")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
                         .permitAll()
-                );
+                )
+                .authenticationProvider(authenticationProvider());
         return http.build();
     }
 

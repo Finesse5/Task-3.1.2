@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class MainController {
+public class AuthController {
 
     @GetMapping("/")
-    public String index() {
+    public String showRoleSelectionPage() {
         return "role-select";
     }
 
     @GetMapping("/login")
-    public String login(@RequestParam(required = false) String role, HttpSession session) {
+    public String showLoginPage(@RequestParam(required = false) String role, HttpSession session) {
         if (role != null) {
             session.setAttribute("selectedRole", role);
         }

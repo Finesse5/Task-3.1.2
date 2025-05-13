@@ -20,10 +20,12 @@ public class SuccessUserHandler implements AuthenticationSuccessHandler {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
         if (selectedRole != null) {
-            if (selectedRole.equals("ROLE_ADMIN") && roles.contains("ROLE_ADMIN")) {
-                response.sendRedirect("/admin");
-            } else if (selectedRole.equals("ROLE_USER") && roles.contains("ROLE_USER")) {
-                response.sendRedirect("/user");
+            if (roles.contains(selectedRole)) {
+                if (selectedRole.equals("ROLE_ADMIN")) {
+                    response.sendRedirect("/admin");
+                } else if (selectedRole.equals("ROLE_USER")) {
+                    response.sendRedirect("/user");
+                }
             } else {
                 response.sendRedirect("/?error=role_mismatch");
             }

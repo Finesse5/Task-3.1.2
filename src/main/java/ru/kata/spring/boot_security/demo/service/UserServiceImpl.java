@@ -1,70 +1,71 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepo, RoleRepository roleRepo, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
-        this.roleRepo = roleRepo;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepo.findAll();
+    @Transactional(readOnly = true)
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
     public void save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepo.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public void update(User user) {
-        // обновим пароль только если он новый
-        User existingUser = userRepo.findById(user.getId()).orElse(null);
-        if (existingUser != null) {
-            if (!user.getPassword().equals(existingUser.getPassword())) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + user.getId()));
+        
+        // Если пароль не изменился (остался зашифрованным), оставляем старый
+        if (user.getPassword().equals(existingUser.getPassword())) {
+            user.setPassword(existingUser.getPassword());
+        } else {
+            // Если пароль новый, шифруем его
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
         }
-        userRepo.save(user);
+        
+        userRepository.save(user);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findById(Long id) {
-        return userRepo.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 
     @Override
     public void deleteById(Long id) {
-        userRepo.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findByUsername(String username) {
-        return userRepo.findByUsername(username);
-    }
-
-    @Override
-    public Set<Role> getAllRoles() {
-        return new java.util.HashSet<>(roleRepo.findAll());
+        return userRepository.findByUsername(username);
     }
 }

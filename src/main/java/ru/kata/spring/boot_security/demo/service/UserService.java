@@ -1,13 +1,10 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.model.Role;
-
 import java.util.List;
-import java.util.Set;
 
 public interface UserService {
-    List<User> getAllUsers();
+    List<User> findAllUsers();
 
     void save(User user);
 
@@ -18,6 +15,4 @@ public interface UserService {
     void deleteById(Long id);
 
     User findByUsername(String username);
-
-    Set<Role> getAllRoles(); // нужен для формы редактирования
 }

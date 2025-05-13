@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 
 import java.security.Principal;
 import java.util.List;
@@ -14,23 +15,25 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping
-    public String adminPage(Model model, Principal principal) {
-        List<User> users = userService.getAllUsers();
+    public String showAdminPage(Model model, Principal principal) {
+        List<User> users = userService.findAllUsers();
         model.addAttribute("users", users);
         model.addAttribute("admin", userService.findByUsername(principal.getName()));
         return "admin";
     }
 
     @GetMapping("/new")
-    public String newUserForm(Model model) {
+    public String showNewUserForm(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("roles", userService.getAllRoles());
+        model.addAttribute("roles", roleService.findAllRoles());
         return "new";
     }
 
@@ -41,9 +44,9 @@ public class AdminController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editUserForm(@PathVariable Long id, Model model) {
+    public String showEditUserForm(@PathVariable Long id, Model model) {
         model.addAttribute("user", userService.findById(id));
-        model.addAttribute("roles", userService.getAllRoles());
+        model.addAttribute("roles", roleService.findAllRoles());
         return "edit";
     }
 
