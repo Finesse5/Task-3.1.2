@@ -38,9 +38,15 @@ public class AdminController {
     }
 
     @PostMapping
-    public String createUser(@ModelAttribute("user") User user) {
-        userService.save(user);
-        return "redirect:/admin";
+    public String createUser(@ModelAttribute("user") User user, Model model) {
+        try {
+            userService.save(user);
+            return "redirect:/admin";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("roles", roleService.findAllRoles());
+            return "new";
+        }
     }
 
     @GetMapping("/edit/{id}")

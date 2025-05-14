@@ -31,6 +31,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
+        // Проверяем, существует ли пользователь с таким username
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new IllegalArgumentException("Пользователь с таким логином уже существует");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

@@ -42,10 +42,19 @@
             color: #2196F3;
             text-decoration: none;
         }
+        .error-message {
+            color: #f44336;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 <h2>Create New User</h2>
+
+<div th:if="${error}" class="error-message" th:text="${error}"></div>
 
 <form th:action="@{/admin}" th:object="${user}" method="post">
     <div class="form-group">
